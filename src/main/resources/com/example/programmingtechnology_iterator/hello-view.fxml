@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.programmingtechnology_iterator.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+
+    <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0">
+        <right>
+          <Button mnemonicParsing="false" onAction="#forward_Button" text="Вперёд" BorderPane.alignment="CENTER" />
+        </right>
+        <center>
+        </center>
+        <left>
+          <Button mnemonicParsing="false" onAction="#back_Button" text="Назад" BorderPane.alignment="CENTER" />
+        </left>
+    </BorderPane>
+    <GridPane>
+        <Button mnemonicParsing="false" GridPane.columnIndex="0" onAction="#startLoop_Button" text="Пуск" />
+
+        <Button mnemonicParsing="false" GridPane.columnIndex="1" onAction="#endLoop_Button" prefHeight="25.0" prefWidth="86.0" text="Остановить" />
+    </GridPane>
+
+</VBox>
