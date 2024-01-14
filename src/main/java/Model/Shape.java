@@ -1,12 +1,12 @@
-package Model;
+package model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public abstract class Shape {
-    private final int x;
-    private final int y;
-    private final Color color;
+    private int x;
+    private int y;
+    private Color color;
 
     public Shape(int x, int y, Color color){
         this.x = x; this.y = y; this.color = color;
@@ -23,6 +23,19 @@ public abstract class Shape {
     public Color getColor(){
         return this.color;
     }
+
+    public void setColor(Color color){
+        this.color = color;
+    }
+
+    public void setX(int x){
+        this.x = x;
+    }
+
+    public void setY(int y){
+        this.y = y;
+    }
+
     public abstract void drawShape(GraphicsContext context);
 
 }

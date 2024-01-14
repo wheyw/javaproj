@@ -1,71 +1,122 @@
 package com.example.proggramingtechnologyshapes;
 
-import Model.Circle;
-import Model.Shape;
-import Model.Square;
-import javafx.fxml.FXML;
+import factory.ShapeFactory;
+import model.Shape;
+import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseButton;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import services.FileManagerShape;
+import services.ShapeRepository;
+import services.infrastructure.IFileManager;
+import services.infrastructure.IRepository;
 
-public class MainController {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class MainController implements Initializable  {
     public Canvas sheet;
     public ColorPicker colorPicker;
     public TextField sizeNumber;
     public Label infoShape;
-    private Shape shape;
-    @FXML
-    public void ButtonCircleAction() {
-        GraphicsContext context = this.sheet.getGraphicsContext2D();
+    public TextField nameShape;
+    private GraphicsContext context;
+    private ShapeFactory factory;
+    private IRepository<Shape> repository;
+    private IFileManager<Shape> fileManager;
 
-        shape = new Circle(50,50,this.colorPicker.getValue(), Double.valueOf(this.sizeNumber.getText()),30.);
-        shape.drawShape(context);
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        context = this.sheet.getGraphicsContext2D();
+        factory = new ShapeFactory();
+        repository = new ShapeRepository();
+        fileManager = new FileManagerShape();
+
+        MainController.initializeHandlers(this);
     }
 
-    @FXML
-    public void ButtonSquareAction() {
-        GraphicsContext context = this.sheet.getGraphicsContext2D();
-
-        try {
-            shape = new Square(20, 20,this.colorPicker.getValue(), Double.parseDouble(this.sizeNumber.getText()));
-            System.out.println(shape);
-            shape.drawShape(context);
-        }
-        catch (Exception ex){
-            System.out.println("" + ex);
-        }
+    private static void initializeHandlers(MainController controller){
+        controller.sheet.setOnMouseClicked(controller::canvasClickHandler);
     }
 
-    @FXML
-    public void ClickMouse(MouseEvent mouseEvent) {
-        GraphicsContext context = this.sheet.getGraphicsContext2D();
+    private void canvasClickHandler(MouseEvent event){
+        double x = event.getX(); double y = event.getY();
 
-        double x = mouseEvent.getX();
-        double y = mouseEvent.getY();
+        Shape shape = factory.createShape(nameShape.getText());
 
-        MouseButton but = mouseEvent.getButton();
-
-        if (sizeNumber.getText().isEmpty()) {
-            System.out.println("ОШИБКА: Размер не указан");
+        if (shape == null) {
+            this.displayWarning("Такой фигуры не существует");
             return;
         }
 
-        var size = Double.parseDouble(this.sizeNumber.getText());
+        shape.setColor(this.colorPicker.getValue());
+        shape.setX((int)x); shape.setY((int)y);
 
-        if (but == MouseButton.PRIMARY){
+        repository.addShape(shape);
 
-            shape = new Square((int)x, (int)y,this.colorPicker.getValue(), size);
-            infoShape.setText("" + shape);
-            shape.drawShape(context);
+        shape.drawShape(context);
+    }
+
+    private void displayWarning(String text){
+        var alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Сообщение");
+        alert.setHeaderText("Ошибка");
+        alert.setContentText(text);
+        alert.showAndWait();
+    }
+
+    private void initCollection(){
+        this.context.setFill(Color.ALICEBLUE);
+        this.context.fillRect(0,0,sheet.getWidth(),sheet.getHeight());
+
+        for (var item: repository.getShapes()) {
+            item.drawShape(context);
         }
-        else {
-            shape = new Circle((int)x,(int)y,this.colorPicker.getValue(), Double.valueOf(this.sizeNumber.getText()),30.);
-            infoShape.setText(shape.toString());
-            shape.drawShape(context);
+    }
+
+    public void back_Button(ActionEvent actionEvent) {
+        this.repository.popShape();
+        initCollection();
+    }
+
+    public void clear_Button(ActionEvent actionEvent) {
+        this.repository.clearRepository();
+        initCollection();
+    }
+
+    public void saveFile_Button(ActionEvent actionEvent) throws FileNotFoundException {
+        fileManager.saveDataToFile(this.repository.getShapes());
+    }
+
+    public void openFile_Button(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(new Stage());
+
+        if (file == null) return;
+
+        repository.clearRepository();
+
+        var temp_shape = fileManager.loadDataFromFile(file);
+
+        if (temp_shape == null){
+            displayWarning("Не распознанный файл");
+            return;
         }
+
+        for(var item : temp_shape)
+            repository.addLastShape(item);
+
+        initCollection();
     }
 }
