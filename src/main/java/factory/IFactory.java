@@ -1,6 +1,6 @@
-package factory;
+package Factory;
 
-import model.Shape;
+import Model.Shape;
 
 public interface IFactory {
     Shape createShape(String name);

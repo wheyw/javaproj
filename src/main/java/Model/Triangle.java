@@ -1,7 +1,9 @@
-package model;
+package Model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
+import java.util.Random;
 
 public class Triangle extends Shape {
 
@@ -10,18 +12,17 @@ public class Triangle extends Shape {
     //Треугольник
     public Triangle(){
         super(20,20, Color.ALICEBLUE);
-        angle = 2 * Math.sqrt(3);
-        length = 40;
+        angle = new Random().nextDouble(0,1);
+        length = 10;
     }
     @Override
     public void drawShape(GraphicsContext context) {
         context.setFill(super.getColor());
-        context.fillPolygon(new double[]{super.getX() + length /2, getX() -  length / 2, getX()}
-                ,new double[]{super.getY() + length / angle ,getY() + length / angle,getY() - length / angle},3);
+        context.fillPolygon(new double[]{super.getX(),getX()+ length*Math.tan(angle), getX() -length},new double[]{super.getY(),getY() -length,getY() -(length*Math.tan(angle))},3);
     }
 
     @Override
     public String toString(){
-        return "Треугольник " + super.getX() + " " + super.getY() + " " + super.getColor().toString();
+        return "Треугольник с координатами x: " + super.getX() + " y: " + super.getY() + " Цвет: " + super.getColor().toString();
     }
 }

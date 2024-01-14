@@ -1,4 +1,4 @@
-package model;
+package Model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -22,6 +22,6 @@ public class Square extends Shape{
 
     @Override
     public String toString(){
-        return "Квадрат " + super.getX() + " " + super.getY() + " " + super.getColor().toString();
+        return "Квадрат с координатами x: " + super.getX() + " y: " + super.getY() + " Цвет: " + super.getColor().toString();
     }
 }
